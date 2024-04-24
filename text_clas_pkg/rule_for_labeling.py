@@ -1,5 +1,5 @@
 # Проводим разметку на основе правил.
-def rule_for_labeling(text: str) -> str:
+def rule_for_labeling(text: str) -> int:
     '''The function defines a rule for assigning a label to the text and performs markup'''
     
     # Определяем списки с ключевыми значениями по каждой из четырех категорий 

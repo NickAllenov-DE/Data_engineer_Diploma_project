@@ -1,16 +1,12 @@
 # Проводим разметку датасета на основе правила
-def rule_based_labeling() -> pd.DataFrame:
-    '''The function performs layout of the dataset based on the rule and returns the marked-up dataframe'''
+def rule_based_labeling(df_rbs: pd.DataFrame) -> pd.DataFrame:
 
-    # Импорт библиотеки
+    # Импорт библиотеки и модуля
     import pandas as pd
     from text_clas_pkg import rule_for_labeling
 
-    # Создание датафрейма Pandas
-    df_rule = pd.read_csv('rule_based_sample.csv')
-
-    # Разметка датафрейма - добавляем в датафрейм колонку в которой 
+    # Разметка датафрейма - добавляем в датафрейм колонку, в которой 
     # будут метки на онове определенного нами правила
-    df_rule['labeled condition name'] = df_rule['medical_abstract'].apply(rule_for_labeling)
+    df_rbs['labeled_condition_mark'] = df_rbs['abstracts'].apply(rule_for_labeling)
 
-    return df_rule
+    return df_rbs
