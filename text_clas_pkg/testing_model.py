@@ -1,5 +1,7 @@
 def testing_model(path_to_csv: str = "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_test.csv"):
+    '''The function loads a trained machine learning model and applies it to a conditionally untagged dataframe'''
 
+    # Импорт библиотек
     import pandas as pd
     from joblib import load
     from sklearn.utils import shuffle

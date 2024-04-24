@@ -1,9 +1,10 @@
 # Переходим к обучению модели.
 # На объединенном размеченном датасете:
 def teaching_and_saving_model(train_df: pd.DataFrame):
+    '''The function trains a machine learning model on a marked-up dataset, saves the model and 
+    a vectorizer for further use, and returns a dataframe with the markup'''
 
     # Импорт библиотек
-    
     from sklearn.model_selection import train_test_split                # разделение данных на обучающую и тестовую части
     from sklearn.feature_extraction.text import TfidfVectorizer         # преобразование текста в вектор
     from sklearn.linear_model import LogisticRegression                 # использование модели логистической регрессии

@@ -2,7 +2,7 @@
 def transforming_datasets(test_path: str = "D:\\GeekBrains\\Data_engineer_Diploma_project\\test.dat", 
                           train_path: str = "D:\\GeekBrains\\Data_engineer_Diploma_project\\train.dat", 
                           test_csv_path: str = "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_test.csv", 
-                          train_csv_path: str = "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_train.csv") -> pd.DataFrame:
+                          train_csv_path: str = "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_train.csv") -> (pd.DataFrame, pd.DataFrame):
     
     '''The function opens downloaded files, generates datasets adapted to processing based on them, and saves new datasets in .csv format'''
 
@@ -37,7 +37,7 @@ def transforming_datasets(test_path: str = "D:\\GeekBrains\\Data_engineer_Diplom
     # Запись данных столбца в файл .csv с заголовками
     df_ma_train.to_csv(train_csv_path, index=False, header=['abstracts'])
 
-    return df_ma_train
+    return df_ma_train, df_ma_test
 
 
 if __name__ == "__main__":

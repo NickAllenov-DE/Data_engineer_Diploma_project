@@ -1,5 +1,7 @@
 # Оценим эффективность модели.
 def accuracy_scoring(df_for_evaluation: pd.DataFrame):
+    '''The function evaluates the effectiveness of the machine learning model 
+    and saves results into .txt files'''
     
     from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
     from datetime import datetime
