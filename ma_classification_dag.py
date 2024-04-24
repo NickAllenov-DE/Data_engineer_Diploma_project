@@ -20,97 +20,111 @@ import time
 import zipfile
 import os
 import pandas as pd
-import text_clas_pkg
+from text_classification_pkg import *
+from airflow import DAG
+from airflow.operators.python_operator import PythonOperator
+from datetime import datetime, timedelta
 
-# Определение аргументов по умолчанию
 default_args = {
-    'owner': 'airflow',
+    'owner': 'AllenovNS',
     'depends_on_past': False,
     'start_date': datetime(2023, 4, 24),
-    'email': ['my_email@example.com'],
-    'email_on_failure': False,
-    'email_on_retry': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
 }
 
-# Определение DAG
 dag = DAG(
-    'my_model_training_pipeline',
+    'my_data_pipeline',
     default_args=default_args,
-    description='A simple pipeline for model training',
+    description='A DAG to process and store data in MySQL',
     schedule_interval=timedelta(days=1),
+    catchup=False
 )
 
-# Определение задач
-t1 = PythonOperator(
+def getting_datasets():
+    # Ваш код для загрузки датасетов
+    pass
+
+def unzip_and_replace_datasets():
+    # Ваш код для распаковки датасетов
+    pass
+
+def transforming_datasets():
+    # Ваш код для трансформации датасетов
+    # Возвращайте датафреймы для последующего использования
+    return df_train, df_test
+
+def merging_labeled_dfs():
+    # Ваш код для объединения маркированных датафреймов
+    return df_merged
+
+def teaching_and_saving_model():
+    # Ваш код для обучения модели и сохранения результатов
+    return df_train_with_predictions
+
+def testing_model():
+    # Ваш код для тестирования модели
+    return df_test_with_predictions
+
+def accuracy_scoring():
+    # Ваш код для оценки точности модели
+    pass
+
+def write_to_mysql():
+    # Ваш код для записи в MySQL
+    pass
+
+# Определение задач для Airflow
+task_getting_datasets = PythonOperator(
     task_id='getting_datasets',
-    python_callable=text_clas_pkg.getting_datasets,
+    python_callable=getting_datasets,
     dag=dag,
 )
 
-t2 = PythonOperator(
-    task_id='unzip_and_replace_dataset',
-    python_callable=text_clas_pkg.unzip_and_replace_dataset,
-    op_kwargs={'zip_path': "C:\\Users\\Allen\\Downloads\\archive.zip", 
-               'extract_to': "D:\\GeekBrains\\Data_engineer_Diploma_project"},
+task_unzip_and_replace_datasets = PythonOperator(
+    task_id='unzip_and_replace_datasets',
+    python_callable=unzip_and_replace_datasets,
     dag=dag,
 )
 
-t3 = PythonOperator(
+task_transforming_datasets = PythonOperator(
     task_id='transforming_datasets',
-    python_callable=text_clas_pkg.transforming_datasets,
-    op_kwargs={'test_path': "D:\\GeekBrains\\Data_engineer_Diploma_project\\test.dat", 
-               'train_path': "D:\\GeekBrains\\Data_engineer_Diploma_project\\train.dat", 
-               'test_csv_path': "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_test.csv", 
-               'train_csv_path': "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_train.csv"},
+    python_callable=transforming_datasets,
     dag=dag,
 )
 
-t4 = PythonOperator(
-    task_id='prepare_dfs_to_labeling',
-    python_callable=text_clas_pkg.prepare_dfs_to_labeling,
-    op_kwargs={'df_train': "{{ ti.xcom_pull(task_ids='transforming_datasets') }}", 
-               'manual_label_csv': 'manual_label_sample.csv', 
-               'rule_based_csv': 'rule_based_sample.csv', 
-               'train_size': 0.01},
-    dag=dag,
-)
-
-t5 = PythonOperator(
-    task_id='rule_based_labeling',
-    python_callable=text_clas_pkg.rule_based_labeling,
-    op_kwargs={'df_rbs': "{{ ti.xcom_pull(task_ids='prepare_dfs_to_labeling') }}"},
-    dag=dag,
-)
-
-t6 = PythonOperator(
+task_merging_labeled_dfs = PythonOperator(
     task_id='merging_labeled_dfs',
-    python_callable=text_clas_pkg.merging_labeled_dfs,
-    op_kwargs={'df_rule': "{{ ti.xcom_pull(task_ids='rule_based_labeling') }}"},
+    python_callable=merging_labeled_dfs,
     dag=dag,
 )
 
-t7 = PythonOperator(
+task_teaching_and_saving_model = PythonOperator(
     task_id='teaching_and_saving_model',
-    python_callable=text_clas_pkg.teaching_and_saving_model,
-    op_kwargs={'train_df': "{{ ti.xcom_pull(task_ids='merging_labeled_dfs') }}"},
+    python_callable=teaching_and_saving_model,
     dag=dag,
 )
 
-t8 = PythonOperator(
+task_testing_model = PythonOperator(
     task_id='testing_model',
-    python_callable=text_clas_pkg.testing_model,
-    op_kwargs={'path_to_csv': "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_test.csv"},
+    python_callable=testing_model,
     dag=dag,
 )
 
-t9 = PythonOperator(
+task_accuracy_scoring = PythonOperator(
     task_id='accuracy_scoring',
-    python_callable=text_clas_pkg.accuracy_scoring,
-    op_kwargs={'df_for_evaluation': "{{ ti.xcom_pull(task_ids='testing_model') }}"},
+    python_callable=accuracy_scoring,
     dag=dag,
 )
 
-# Определение последовательности выполнения задач
-t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7 >> t8 >> t9
+task_write_to_mysql = PythonOperator(
+    task_id='write_to_mysql',
+    python_callable=write_to_mysql,
+    dag=dag,
+)
+
+# Определение порядка выполнения задач
+task_getting_datasets >> task_unzip_and_replace_datasets >> task_transforming_datasets
+task_transforming_datasets >> [task_merging_labeled_dfs, task_write_to_mysql]
+task_merging_labeled_dfs >> task_teaching_and_saving_model >> task_accuracy_scoring
+task_write_to_mysql >> task_testing_model >> task_accuracy_scoring

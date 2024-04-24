@@ -5,7 +5,7 @@ def testing_model(path_to_csv: str = "D:\\GeekBrains\\Data_engineer_Diploma_proj
     import pandas as pd
     from joblib import load
     from sklearn.utils import shuffle
-    from text_clas_pkg import rule_based_labeling
+    from text_classification_pkg import rule_based_labeling
 
     # Загрузка модели
     model = load('model_ma_trained.joblib')

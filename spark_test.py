@@ -37,3 +37,50 @@ create_db = SparkSubmitOperator(
 # Определение последовательности выполнения задач
 t7 >> create_db
 t8 >> create_db
+
+
+
+
+
+
+# import org.apache.spark.sql.SparkSession
+# import org.apache.spark.sql.SaveMode
+
+# object MySQLSparkExample {
+#   def main(args: Array[String]): Unit = {
+#     val spark = SparkSession.builder()
+#       .appName("MySQLSparkExample")
+#       .getOrCreate()
+
+#     // Параметры подключения к базе данных MySQL
+#     val jdbcUrl = "jdbc:mysql://localhost:3306/"
+#     val dbProperties = new java.util.Properties()
+#     dbProperties.setProperty("user", "yourUsername")
+#     dbProperties.setProperty("password", "yourPassword")
+#     dbProperties.setProperty("driver", "com.mysql.jdbc.Driver")
+
+#     // Создание базы данных (если она еще не создана)
+#     val connection = java.sql.DriverManager.getConnection(jdbcUrl, "yourUsername", "yourPassword")
+#     try {
+#       val statement = connection.createStatement()
+#       statement.executeUpdate("CREATE DATABASE IF NOT EXISTS myDatabase")
+#     } finally {
+#       connection.close()
+#     }
+
+#     // Загрузка датасетов в Spark
+#     val dataset1 = spark.read.json("path_to_your_dataset1.json")
+#     val dataset2 = spark.read.json("path_to_your_dataset2.json")
+
+#     // Запись датасетов в таблицы MySQL
+#     dataset1.write
+#       .mode(SaveMode.Overwrite)
+#       .jdbc(jdbcUrl + "myDatabase", "dataset1Table", dbProperties)
+
+#     dataset2.write
+#       .mode(SaveMode.Overwrite)
+#       .jdbc(jdbcUrl + "myDatabase", "dataset2Table", dbProperties)
+
+#     spark.stop()
+#   }
+# }
