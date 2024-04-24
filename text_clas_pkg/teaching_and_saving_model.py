@@ -3,6 +3,7 @@
 def teaching_and_saving_model(train_df: pd.DataFrame):
 
     # Импорт библиотек
+    
     from sklearn.model_selection import train_test_split                # разделение данных на обучающую и тестовую части
     from sklearn.feature_extraction.text import TfidfVectorizer         # преобразование текста в вектор
     from sklearn.linear_model import LogisticRegression                 # использование модели логистической регрессии
@@ -24,10 +25,14 @@ def teaching_and_saving_model(train_df: pd.DataFrame):
     model.fit(X_train, Y_train)
 
     Y_test_predicted = model.predict(X_test)
+    # Добавление колонки с предсказанными значениями в датафрейм
+    train_df['predicted_mark'] = Y_test_predicted
+    # Сохранение датасета с предсказанными значениями
+    train_df.to_csv('ma_train_with_predictions.csv', index=False)
 
     # Сохранение модели
     dump(model, 'model_ma_trained.joblib')
     # Сохранение векторизатора
     dump(vectorizer, 'vectorizer_ma_trained.joblib')
 
-    return Y_test, Y_test_predicted
+    return train_df
