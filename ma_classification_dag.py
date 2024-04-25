@@ -7,9 +7,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from urllib.parse import urljoin
-from sklearn.model_selection import train_test_split                # разделение данных на обучающую и тестовую части
-from sklearn.feature_extraction.text import TfidfVectorizer         # преобразование текста в вектор
-from sklearn.linear_model import LogisticRegression                 # использование модели логистической регрессии
+from sklearn.model_selection import train_test_split    
+from sklearn.feature_extraction.text import TfidfVectorizer    
+from sklearn.linear_model import LogisticRegression                 
 from sklearn.utils import shuffle
 from joblib import dump, load
 from airflow import DAG
@@ -20,22 +20,22 @@ import time
 import zipfile
 import os
 import pandas as pd
-from text_classification_pkg import *
-
+from text_classification_module import *
 
 default_args = {
     'owner': 'AllenovNS',
     'depends_on_past': False,
-    'start_date': datetime(2023, 4, 24),
+    'start_date': datetime(2023, 4, 25),
     'retries': 1,
-    'retry_delay': timedelta(minutes=5),
+    'retry_delay': timedelta(minutes=2),
 }
 
 dag = DAG(
-    'my_data_pipeline',
+    'GB_DE_Diploma_Project_pipeline',
     default_args=default_args,
-    description='A DAG to process and store data in MySQL',
-    schedule_interval=timedelta(days=1),
+    description='A DAG to process and classification datasets contain\
+        medical abstracts and store data in MySQL',
+    schedule_interval=None,
     catchup=False
 )
 
