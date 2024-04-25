@@ -21,9 +21,7 @@ import zipfile
 import os
 import pandas as pd
 from text_classification_pkg import *
-from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
-from datetime import datetime, timedelta
+
 
 default_args = {
     'owner': 'AllenovNS',
@@ -40,39 +38,6 @@ dag = DAG(
     schedule_interval=timedelta(days=1),
     catchup=False
 )
-
-def getting_datasets():
-    # Ваш код для загрузки датасетов
-    pass
-
-def unzip_and_replace_datasets():
-    # Ваш код для распаковки датасетов
-    pass
-
-def transforming_datasets():
-    # Ваш код для трансформации датасетов
-    # Возвращайте датафреймы для последующего использования
-    return df_train, df_test
-
-def merging_labeled_dfs():
-    # Ваш код для объединения маркированных датафреймов
-    return df_merged
-
-def teaching_and_saving_model():
-    # Ваш код для обучения модели и сохранения результатов
-    return df_train_with_predictions
-
-def testing_model():
-    # Ваш код для тестирования модели
-    return df_test_with_predictions
-
-def accuracy_scoring():
-    # Ваш код для оценки точности модели
-    pass
-
-def write_to_mysql():
-    # Ваш код для записи в MySQL
-    pass
 
 # Определение задач для Airflow
 task_getting_datasets = PythonOperator(

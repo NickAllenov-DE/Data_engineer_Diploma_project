@@ -1,5 +1,4 @@
 __all__ = [
-    'import_libraries',
     'getting_datasets', 
     'unzip_and_replace_datasets', 
     'transforming_datasets', 
@@ -8,6 +7,8 @@ __all__ = [
     'rule_based_labeling', 
     'merging_labeled_dfs',
     'teaching_and_saving_model',
+    'testing_model',
     'accuracy_scoring',
-    'testing_model'
+    'create_database',
+    'write_datframe_to_mysql'
     ]

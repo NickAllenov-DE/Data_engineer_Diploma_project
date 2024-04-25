@@ -1,6 +1,7 @@
 # Разархивирование загруженного архива в рабочую директорию
+import os
 def unzip_and_replace_datasets(zip_path: str ="C:\\Users\\Allen\\Downloads\\archive.zip", 
-                              extract_to: str = "D:\\GeekBrains\\Data_engineer_Diploma_project") -> None:
+                              extract_to: str = os.getcwd()) -> None:
     '''The function unzips the downloaded archive into the working directory'''
 
     # Импорт библиотек
