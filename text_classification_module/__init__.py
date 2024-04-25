@@ -10,5 +10,5 @@ __all__ = [
     'testing_model',
     'accuracy_scoring',
     'create_database',
-    'write_datframe_to_mysql'
+    'write_dataframe_to_mysql'
     ]
