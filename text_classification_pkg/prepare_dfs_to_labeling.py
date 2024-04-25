@@ -1,3 +1,4 @@
+import pandas as pd
 # Готовим датафреймы к разметке
 def prepare_dfs_to_labeling(df_train: pd.DataFrame, manual_label_csv: str = 'manual_label_sample.csv', 
                         rule_based_csv: str = 'rule_based_sample.csv', train_size: float = 0.01) -> pd.DataFrame:

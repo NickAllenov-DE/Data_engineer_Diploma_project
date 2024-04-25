@@ -1,4 +1,5 @@
 # Оценим эффективность модели.
+import pandas as pd
 def accuracy_scoring(df_for_evaluation: pd.DataFrame):
     '''The function evaluates the effectiveness of the machine learning model 
     and saves results into .txt files'''

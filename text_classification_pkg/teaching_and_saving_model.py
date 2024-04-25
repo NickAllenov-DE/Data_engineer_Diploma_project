@@ -1,5 +1,6 @@
 # Переходим к обучению модели.
 # На объединенном размеченном датасете:
+import pandas as pd
 def teaching_and_saving_model(train_df: pd.DataFrame):
     '''The function trains a machine learning model on a marked-up dataset, saves the model and 
     a vectorizer for further use, and returns a dataframe with the markup'''

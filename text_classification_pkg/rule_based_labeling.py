@@ -1,3 +1,4 @@
+import pandas as pd
 # Проводим разметку датасета на основе правила
 def rule_based_labeling(df_rbs: pd.DataFrame) -> pd.DataFrame:
     '''The function performs the markup of the dataframe - we add a column to the dataframe, 

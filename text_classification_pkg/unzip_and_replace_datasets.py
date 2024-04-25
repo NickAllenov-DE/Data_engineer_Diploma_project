@@ -1,5 +1,5 @@
 # Разархивирование загруженного архива в рабочую директорию
-def unzip_and_replace_dataset(zip_path: str ="C:\\Users\\Allen\\Downloads\\archive.zip", 
+def unzip_and_replace_datasets(zip_path: str ="C:\\Users\\Allen\\Downloads\\archive.zip", 
                               extract_to: str = "D:\\GeekBrains\\Data_engineer_Diploma_project") -> None:
     '''The function unzips the downloaded archive into the working directory'''
 
@@ -26,4 +26,4 @@ def unzip_and_replace_dataset(zip_path: str ="C:\\Users\\Allen\\Downloads\\archi
 if __name__ == "__main__":
     zip_file_path = "C:\\Users\\Allen\\Downloads\\archive.zip"
     destination_directory = "D:\\GeekBrains\\Data_engineer_Diploma_project"
-    unzip_and_replace_dataset(zip_file_path, destination_directory)  
+    unzip_and_replace_datasets(zip_file_path, destination_directory)  

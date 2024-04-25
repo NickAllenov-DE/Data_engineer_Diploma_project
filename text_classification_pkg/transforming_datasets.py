@@ -1,8 +1,7 @@
+import pandas as pd
 # Преобразование датасетов 
-def transforming_datasets(test_path: str = "D:\\GeekBrains\\Data_engineer_Diploma_project\\test.dat", 
-                          train_path: str = "D:\\GeekBrains\\Data_engineer_Diploma_project\\train.dat", 
-                          test_csv_path: str = "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_test.csv", 
-                          train_csv_path: str = "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_train.csv") -> (pd.DataFrame, pd.DataFrame):
+def transforming_datasets(test_path: str = "test.dat", train_path: str = "train.dat", 
+                          test_csv_path: str = "ma_test.csv", train_csv_path: str = "ma_train.csv") -> pd.DataFrame:
     
     '''The function opens downloaded files, generates datasets adapted to processing based on them, and saves new datasets in .csv format'''
 
@@ -25,25 +24,25 @@ def transforming_datasets(test_path: str = "D:\\GeekBrains\\Data_engineer_Diplom
 
     # Трансформируем df_test в датасет формата .csv:
     # Выбор только первого столбца
-    df_ma_test = df_test.iloc[:, 0]
+    df_ma_test = df_test.iloc[:, [0]].rename(columns={0: 'abstracts'})
 
     # Запись данных первого столбца в файл .csv с заголовком
     df_ma_test.to_csv(test_csv_path, index=False, header=['abstracts'])
 
     # Теперь преобразуем df_train:
-    # Выбор второй колонки
-    df_ma_train = df_train.iloc[:, 1]
+    # Выбор первых двух сколонок
+    df_ma_train = df_train.iloc[:, [1]].rename(columns={1: 'abstracts'})
 
-    # Запись данных столбца в файл .csv с заголовками
+    # Запись данных столбцов в файл .csv с заголовками
     df_ma_train.to_csv(train_csv_path, index=False, header=['abstracts'])
 
     return df_ma_train, df_ma_test
 
 
 if __name__ == "__main__":
-    test_dat_path = "D:\\GeekBrains\\Data_engineer_Diploma_project\\test.dat"
-    train_dat_path = "D:\\GeekBrains\\Data_engineer_Diploma_project\\train.dat"
-    test_csv_path = "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_test.csv"
-    train_csv_path = "D:\\GeekBrains\\Data_engineer_Diploma_project\\ma_train.csv"
+    test_dat_path = "test.dat"
+    train_dat_path = "train.dat"
+    test_csv_path = "ma_test.csv"
+    train_csv_path = "ma_train.csv"
     transforming_datasets(test_dat_path, train_dat_path, test_csv_path, train_csv_path)
     

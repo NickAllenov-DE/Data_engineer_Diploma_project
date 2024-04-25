@@ -1,5 +1,6 @@
 # Объединение датасетов, если есть датасет, размеченный вручную, 
 # и приведение их к виду который будет использоваться для обучения модели
+import pandas as pd
 def merging_labeled_dfs(df_rule: pd.DataFrame) -> pd.DataFrame:
     '''The function combines the date frames obtained as a result of automatic 
     rule-based markup and manual markup and brings the combined dataframe to the 
