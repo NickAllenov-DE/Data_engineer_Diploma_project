@@ -1,6 +1,12 @@
 
 # Импорт библиотек
 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from urllib.parse import urljoin
 from sklearn.model_selection import train_test_split    
 from sklearn.feature_extraction.text import TfidfVectorizer    
@@ -63,7 +69,7 @@ def my_text_classification_dag():
         return {'dftn': df_train, 'dfts': df_test}
 
     @task
-    def prepare_dfs_to_labeling_task(df_train: pd.DataFrame):
+    def prepare_dfs_to_labeling_task(df_train: str):
         return prepare_dfs_to_labeling(df_train)
 
     @task
@@ -79,7 +85,7 @@ def my_text_classification_dag():
         return teaching_and_saving_model(df_merged)
 
     @task
-    def testing_model_task(df_test: pd.DataFrame):
+    def testing_model_task(df_test: str):
         return testing_model(df_test)
 
     @task
@@ -107,9 +113,9 @@ def my_text_classification_dag():
     create_db = create_db_task()
     get_ds = getting_dataset_by_api_task()
     unzip = unzip_and_replace_datasets_task()
-    transform = transforming_datasets_task()
     
     # Зависимости для задач, связанных с обработкой и анализом данных
+    df1_df2 = transforming_datasets_task()
     split_dfs = split_dataframes(df1_df2=df1_df2)
     df_prep = prepare_dfs_to_labeling_task(df_train=split_dfs['dftn'])
     df_rbl = rule_based_labeling_task(df_prep=df_prep)
@@ -122,7 +128,7 @@ def my_text_classification_dag():
     write_test = write_test_task(df_tested)
 
     # Установка порядка выполнения задач
-    create_db >> get_ds >> unzip >> transform
+    create_db >> get_ds >> unzip >> df1_df2
     df1_df2['dftn'] >> df_prep >> df_rbl >> df_merged >> df_trained >> train_scoring >> write_train
     df1_df2['dfts'] >> df_tested >> test_scoring >> write_test
     

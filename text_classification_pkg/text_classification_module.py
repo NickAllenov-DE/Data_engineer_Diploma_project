@@ -115,37 +115,35 @@ def unzip_and_replace_datasets(zip_path: str ="C:\\Users\\Allen\\Downloads\\arch
         print(f"An error occurred: {e}")
  
 
-def transforming_datasets(test_path: str = "test.dat", train_path: str = "train.dat", 
-                          test_csv_path: str = "ma_test.csv", train_csv_path: str = "ma_train.csv") -> pd.DataFrame:
+def transforming_datasets(train_path: str = "train.dat", test_path: str = "test.dat",
+                          test_csv_path: str = "ma_test.csv", train_csv_path: str = "ma_train.csv") -> tuple[str, str]:
     '''The function opens downloaded files, generates datasets adapted to processing based on them, and saves new datasets in .csv format'''
 
     # В архиве датасеты (тренировочный и тестовый) содержатся в формате .dat
     # поэтому, нам нужно их переформатировать в датасеты, пригодные и удобные для дальнейшего использования
     # Чтение файла .dat
 
-    df_test = pd.read_fwf(test_path, sep='\t', header=None)
     df_train = pd.read_fwf(train_path, sep='\t', header=None)
-
+    df_test = pd.read_fwf(test_path, sep='\t', header=None)
+    
     # Датафрейм df_test имеет атипичную ненормализованную структуру - всего 101 столбец, все аннотации содержатся в первом столбце, 
     # остальные колонки пустые, поэтому нам нужно создать датафрейм только из первой колонки.
     # Датафрейм df_train имеет схожую структуру - 101 столбец, первая колонка - классы заболеваний,
     # все аннотации содержатся во втором столбце, остальные колонки пустые.
-    # Для нашей дальнейшей работы метки классов нам не требуются,
+    # Для нашей дальнейшей работы метки классов нам не требуются (потому что они неправильные),
     # поэтому нам нужно создать датафрейм из второго столбца.
 
+    # Преобразуем df_train:
+    # Выбор второго столбца
+    df_ma_train = df_train.iloc[:, [1]].rename(columns={1: 'abstracts'})
     # Трансформируем df_test в датасет формата .csv:
     # Выбор только первого столбца
     df_ma_test = df_test.iloc[:, [0]].rename(columns={0: 'abstracts'})
-
-    # Запись данных первого столбца в файл .csv с заголовком
-    df_ma_test.to_csv(test_csv_path, index=False, header=['abstracts'])
-
-    # Теперь преобразуем df_train:
-    # Выбор второго столбца
-    df_ma_train = df_train.iloc[:, [1]].rename(columns={1: 'abstracts'})
-
-    # Запись данных столбцов в файл .csv с заголовком
+    # Запись датафреймов в файл .csv с заголовком
     df_ma_train.to_csv(train_csv_path, index=False, header=['abstracts'])
+    df_ma_test.to_csv(test_csv_path, index=False, header=['abstracts'])    
+
+    return train_csv_path, test_csv_path
 
 
 def prepare_dfs_to_labeling(path_to_ds_csv: str, manual_label_csv: str = 'manual_label_sample.csv', 
