@@ -14,6 +14,8 @@ import zipfile
 import os
 import pandas as pd
 from sqlalchemy import create_engine
+import MySQLdb
+from airflow.hooks.base_hook import BaseHook
 
 
 def getting_dataset_by_api(ds_name: str = 'chaitanyakck/medical-text', path: str = os.getcwd()):
@@ -323,7 +325,7 @@ def teaching_and_saving_model(train_df_path: str, trained_df_csv: str = 'ma_trai
     '''The function trains a machine learning model on a marked-up dataset, saves the model and 
     a vectorizer for further use, and returns a dataframe with the markup'''
 
-    train_df = pd.read_clipboard(train_df_path)
+    train_df = pd.read_csv(train_df_path)
 
     # Для начала, перемешаем датасет.
     train_df = shuffle(train_df)
@@ -441,6 +443,8 @@ def create_database(mysql_conn_id: str, database_name: str):
 
 def write_dataframe_to_mysql(table_name: str, df_path: str, mysql_conn_id: str):
     # Получение параметров подключения из Airflow
+    import MySQLdb
+    from airflow.hooks.base_hook import BaseHook
     connection_params = BaseHook.get_connection(mysql_conn_id)
     conn_str = f"mysql+mysqldb://{connection_params.login}:{connection_params.password}" \
                f"@{connection_params.host}/{connection_params.schema}"

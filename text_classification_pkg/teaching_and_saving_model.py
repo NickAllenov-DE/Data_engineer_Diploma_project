@@ -5,7 +5,7 @@ def teaching_and_saving_model(train_df_path: str, trained_df_csv: str = 'ma_trai
     '''The function trains a machine learning model on a marked-up dataset, saves the model and 
     a vectorizer for further use, and returns a dataframe with the markup'''
 
-    train_df = pd.read_clipboard(train_df_path)
+    train_df = pd.read_csv(train_df_path)
 
     # Для начала, перемешаем датасет.
     train_df = shuffle(train_df)
