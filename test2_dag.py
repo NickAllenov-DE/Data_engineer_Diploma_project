@@ -1,12 +1,6 @@
 
 # Импорт библиотек
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
 from urllib.parse import urljoin
 from sklearn.model_selection import train_test_split    
 from sklearn.feature_extraction.text import TfidfVectorizer    
@@ -73,15 +67,15 @@ def my_text_classification_dag():
         return prepare_dfs_to_labeling(df_train)
 
     @task
-    def rule_based_labeling_task(df_prep: pd.DataFrame):
+    def rule_based_labeling_task(df_prep: str):
         return rule_based_labeling(df_prep)
 
     @task
-    def merging_labeled_dfs_task(df_rbl: pd.DataFrame):
+    def merging_labeled_dfs_task(df_rbl: str):
         return merging_labeled_dfs(df_rbl)
 
     @task
-    def teaching_and_saving_model_task(df_merged: pd.DataFrame):
+    def teaching_and_saving_model_task(df_merged: str):
         return teaching_and_saving_model(df_merged)
 
     @task
@@ -89,11 +83,11 @@ def my_text_classification_dag():
         return testing_model(df_test)
 
     @task
-    def train_accuracy_scoring_task(df_trained: pd.DataFrame):
+    def train_accuracy_scoring_task(df_trained: str):
         accuracy_scoring(df_trained)
 
     @task
-    def test_accuracy_scoring_task(df_tested: pd.DataFrame):
+    def test_accuracy_scoring_task(df_tested: str):
         accuracy_scoring(df_tested)
 
     @task
@@ -101,11 +95,11 @@ def my_text_classification_dag():
         create_database('airflow_db', 'DE_DP_text_classification')
 
     @task
-    def write_train_task(df_trained: pd.DataFrame):
+    def write_train_task(df_trained: str):
         write_dataframe_to_mysql('train_df_with_predictions', df_trained, 'mysql_conn_id')
 
     @task
-    def write_test_task(df_tested: pd.DataFrame):
+    def write_test_task(df_tested: str):
         write_dataframe_to_mysql('test_df_with_predictions', df_tested, 'mysql_conn_id')
 
     

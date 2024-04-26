@@ -1,4 +1,21 @@
 
+
+from kaggle.api.kaggle_api_extended import KaggleApi
+from urllib.parse import urljoin
+from sklearn.model_selection import train_test_split                # разделение данных на обучающую и тестовую части
+from sklearn.feature_extraction.text import TfidfVectorizer         # преобразование текста в вектор
+from sklearn.linear_model import LogisticRegression                 # использование модели логистической регрессии
+from sklearn.utils import shuffle
+from joblib import dump, load
+from datetime import datetime, timedelta
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import time
+import zipfile
+import os
+import pandas as pd
+from sqlalchemy import create_engine
+
+
 def getting_dataset_by_api(ds_name: str = 'chaitanyakck/medical-text', path: str = os.getcwd()):
     from kaggle.api.kaggle_api_extended import KaggleApi
 
@@ -147,7 +164,7 @@ def transforming_datasets(train_path: str = "train.dat", test_path: str = "test.
 
 
 def prepare_dfs_to_labeling(path_to_ds_csv: str, manual_label_csv: str = 'manual_label_sample.csv', 
-                        rule_based_csv: str = 'rule_based_sample.csv', train_size: float = 0.01):
+                        rule_based_csv: str = 'rule_based_sample.csv', train_size: float = 0.01) -> str:
     """
     Divides the dataframe into two parts for manual markup and for automatic rule-based markup.
     Returns dataframe for automatic rule-based markup.
@@ -168,7 +185,7 @@ def prepare_dfs_to_labeling(path_to_ds_csv: str, manual_label_csv: str = 'manual
     manual_label_sample.to_csv(manual_label_csv, index=False)
     rule_based_sample.to_csv(rule_based_csv, index=False)
 
-    return rule_based_sample
+    return rule_based_csv
 
 
 def rule_for_labeling(text: str) -> int:
@@ -254,12 +271,15 @@ def rule_for_labeling(text: str) -> int:
         return int(5)
     
 
-def rule_based_labeling(df_rbs: pd.DataFrame):
+def rule_based_labeling(df_rbs_path: str, df_rbs_csv: str = 'df_rule_labeled.csv') -> str:
     '''The function performs the markup of the dataframe - we add a column to the dataframe, 
     in which there will be labels based on a rule defined by us'''
 
+    df_rbs = pd.read_csv(df_rbs_path)
     df_rbs['labeled_condition_mark'] = df_rbs['abstracts'].apply(rule_for_labeling)
-    return df_rbs
+    df_rbs.to_csv(df_rbs_csv, index=False)
+
+    return df_rbs_csv
 
 
 # Ручную разметку выборки выдержек из медицинских статей в размере 144 шт (0,01 от всего датасета) я провел в Label Studio,
@@ -268,10 +288,12 @@ def rule_based_labeling(df_rbs: pd.DataFrame):
 
 # Объединение датасетов, если есть датасет, размеченный вручную, 
 # и приведение их к виду который будет использоваться для обучения модели
-def merging_labeled_dfs(df_rule: pd.DataFrame) -> pd.DataFrame:
+def merging_labeled_dfs(df_rule_path: str, merge_df_csv: str = 'df_merged.csv') -> str:
     '''The function combines the date frames obtained as a result of automatic 
     rule-based markup and manual markup and brings the combined dataframe to the 
     form in which it will be used to train the model'''
+
+    df_rule = pd.read_csv(df_rule_path)
 
     # Проверка наличия датасета размеченного вручную в текущей директории
     # Поскольку процесс будет выполняться автоматизированно, этап ручной разметки может быть исключен из процесса,
@@ -292,14 +314,16 @@ def merging_labeled_dfs(df_rule: pd.DataFrame) -> pd.DataFrame:
         df_merged = df_rule
 
     # Сохраним результирующий датасет
-    df_merged.to_csv('merged_dataset.csv', index=False)
+    df_merged.to_csv(merge_df_csv, index=False)
 
-    return df_merged
+    return merge_df_csv
 
 
-def teaching_and_saving_model(train_df: pd.DataFrame):
+def teaching_and_saving_model(train_df_path: str, trained_df_csv: str = 'ma_train_with_predictions.csv') -> str:
     '''The function trains a machine learning model on a marked-up dataset, saves the model and 
     a vectorizer for further use, and returns a dataframe with the markup'''
+
+    train_df = pd.read_clipboard(train_df_path)
 
     # Для начала, перемешаем датасет.
     train_df = shuffle(train_df)
@@ -322,16 +346,16 @@ def teaching_and_saving_model(train_df: pd.DataFrame):
     train_df['predicted_mark'] = Y_predicted
 
     # Сохранение датасета с предсказанными значениями
-    train_df.to_csv('ma_train_with_predictions.csv', index=False)
+    train_df.to_csv(trained_df_csv, index=False)
 
     # Сохранение модели и векторизатора
     dump(model, 'model_ma_trained.joblib')
     dump(vectorizer, 'vectorizer_ma_trained.joblib')
 
-    return train_df
+    return trained_df_csv
 
 
-def testing_model(path_to_ds_csv: str) -> pd.DataFrame:
+def testing_model(path_to_ds_csv: str, tested_df_csv: str = 'ma_test_with_predictions.csv') -> str:
     '''The function loads a trained machine learning model and applies it to an untagged dataframe'''
 
     # Загрузка модели
@@ -356,14 +380,16 @@ def testing_model(path_to_ds_csv: str) -> pd.DataFrame:
     # Сохранение датасета с размеченными и предсказанными значениями
     df_test.to_csv('ma_test_with_predictions.csv', index=False)
 
-    return df_test
+    return tested_df_csv
 
 
 
-def accuracy_scoring(df_for_evaluation: pd.DataFrame):
+def accuracy_scoring(df_for_evaluation_path: str):
     '''The function evaluates the effectiveness of the machine learning model 
     and saves results into .txt files'''
     
+    df_for_evaluation = pd.read_csv(df_for_evaluation_path)
+
     true_labels = df_for_evaluation['labeled_condition_mark']
     predicted_labels = df_for_evaluation['predicted_mark']
     
@@ -413,12 +439,14 @@ def create_database(mysql_conn_id: str, database_name: str):
     print(f"Database {database_name} created successfully.")
 
 
-def write_dataframe_to_mysql(table_name: str, df: pd.DataFrame, mysql_conn_id: str):
+def write_dataframe_to_mysql(table_name: str, df_path: str, mysql_conn_id: str):
     # Получение параметров подключения из Airflow
     connection_params = BaseHook.get_connection(mysql_conn_id)
     conn_str = f"mysql+mysqldb://{connection_params.login}:{connection_params.password}" \
                f"@{connection_params.host}/{connection_params.schema}"
     engine = create_engine(conn_str)
+
+    df = pd.read_csv(df_path)
 
     # Запись датафрейма в базу данных MySQL
     df.to_sql(name=table_name, con=engine, if_exists='replace', index=False)
@@ -432,12 +460,6 @@ if __name__ == "__main__":
 # Импорт библиотек
 
     from kaggle.api.kaggle_api_extended import KaggleApi
-    from selenium import webdriver
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.common.keys import Keys
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-    from selenium.webdriver.chrome.options import Options
     from urllib.parse import urljoin
     from sklearn.model_selection import train_test_split                # разделение данных на обучающую и тестовую части
     from sklearn.feature_extraction.text import TfidfVectorizer         # преобразование текста в вектор

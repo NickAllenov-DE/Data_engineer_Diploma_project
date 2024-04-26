@@ -1,5 +1,5 @@
 
-def testing_model(path_to_ds_csv: str) -> pd.DataFrame:
+def testing_model(path_to_ds_csv: str, tested_df_csv: str = 'ma_test_with_predictions.csv') -> str:
     '''The function loads a trained machine learning model and applies it to an untagged dataframe'''
 
     # Загрузка модели
@@ -24,5 +24,4 @@ def testing_model(path_to_ds_csv: str) -> pd.DataFrame:
     # Сохранение датасета с размеченными и предсказанными значениями
     df_test.to_csv('ma_test_with_predictions.csv', index=False)
 
-    return df_test
-
+    return tested_df_csv
