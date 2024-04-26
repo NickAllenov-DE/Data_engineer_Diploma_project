@@ -1,6 +1,6 @@
 
 # Готовим датафреймы к разметке
-def prepare_dfs_to_labeling(df_train: pd.DataFrame, manual_label_csv: str = 'manual_label_sample.csv', 
+def prepare_dfs_to_labeling(path_to_ds_csv: str, manual_label_csv: str = 'manual_label_sample.csv', 
                         rule_based_csv: str = 'rule_based_sample.csv', train_size: float = 0.01) -> pd.DataFrame:
     """
     Divides the dataframe into two parts for manual markup and for automatic rule-based markup.
@@ -12,6 +12,8 @@ def prepare_dfs_to_labeling(df_train: pd.DataFrame, manual_label_csv: str = 'man
     rule_based_csv (str): Путь к файлу CSV для разметки на основе правил.
     train_size (float): Доля датафрейма для ручной разметки.
     """
+
+    df_train = pd.read_csv(path_to_ds_csv)
     
     # Импорт библиотек
     import pandas as pd

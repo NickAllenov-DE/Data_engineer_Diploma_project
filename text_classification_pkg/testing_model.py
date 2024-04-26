@@ -1,30 +1,28 @@
-def testing_model(path_to_csv: str = "ma_test.csv"):
-    '''The function loads a trained machine learning model and applies it to a conditionally untagged dataframe'''
 
-    # Импорт библиотек
-    import pandas as pd
-    from joblib import load
-    from sklearn.utils import shuffle
-    from text_classification_module import rule_based_labeling
+def testing_model(path_to_ds_csv: str) -> pd.DataFrame:
+    '''The function loads a trained machine learning model and applies it to an untagged dataframe'''
 
     # Загрузка модели
     model = load('model_ma_trained.joblib')
     # Загрузка векторизатора
     vectorizer = load('vectorizer_ma_trained.joblib')
 
-    # Загрузка тестового датасета
-    test_df = pd.read_csv(path_to_csv)
-    # разметка тестового датасета на основе правил
-    test_df = rule_based_labeling(test_df)
+    df_test = pd.read_csv(path_to_ds_csv)
 
-    # Применим векторизатор к новым текстовым данным
-    new_texts_vectorized = vectorizer.transform(test_df['abstracts'])
+    # Преобразование текстовых данных нового датафрейма в векторный формат
+    X_new = vectorizer.transform(df_test['abstracts'])
     # Используем модель для предсказания меток новых данных
-    new_predictions = model.predict(new_texts_vectorized)
+    Y_new_predicted = model.predict(X_new)
+
+    # разметка тестового датасета на основе правил для послдующей
+    # оценки эффективности модели
+    df_test = rule_based_labeling(df_test)
+
     # Добавление колонки с предсказанными значениями в датафрейм
-    test_df['predicted_mark'] = new_predictions
+    df_test['predicted_mark'] = Y_new_predicted
    
     # Сохранение датасета с размеченными и предсказанными значениями
-    test_df.to_csv('ma_test_with_predictions.csv', index=False)
+    df_test.to_csv('ma_test_with_predictions.csv', index=False)
 
-    return test_df
+    return df_test
+

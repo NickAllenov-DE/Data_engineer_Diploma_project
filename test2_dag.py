@@ -1,12 +1,6 @@
 
 # Импорт библиотек
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
 from urllib.parse import urljoin
 from sklearn.model_selection import train_test_split    
 from sklearn.feature_extraction.text import TfidfVectorizer    
@@ -26,7 +20,7 @@ import os
 import pandas as pd
 import pendulum
 import MySQLdb
-from text_classification_module import getting_datasets, unzip_and_replace_datasets,\
+from text_classification_pkg.text_classification_module import getting_dataset_by_api, unzip_and_replace_datasets,\
         transforming_datasets, prepare_dfs_to_labeling, rule_for_labeling,\
         rule_based_labeling, merging_labeled_dfs, teaching_and_saving_model,\
         testing_model, accuracy_scoring, create_database, write_dataframe_to_mysql
@@ -52,8 +46,8 @@ def my_text_classification_dag():
     # Использование декоратора @task для определения задачи
 
     @task
-    def getting_datasets_task():
-        getting_datasets()
+    def getting_dataset_by_api_task():
+        getting_dataset_by_api()
 
     @task
     def unzip_and_replace_datasets_task():
@@ -111,11 +105,11 @@ def my_text_classification_dag():
     
     # Установка зависимостей
     create_db = create_db_task()
-    get_ds = getting_datasets_task()
+    get_ds = getting_dataset_by_api_task()
     unzip = unzip_and_replace_datasets_task()
+    transform = transforming_datasets_task()
     
     # Зависимости для задач, связанных с обработкой и анализом данных
-    df1_df2 = transforming_datasets_task()
     split_dfs = split_dataframes(df1_df2=df1_df2)
     df_prep = prepare_dfs_to_labeling_task(df_train=split_dfs['dftn'])
     df_rbl = rule_based_labeling_task(df_prep=df_prep)
@@ -128,7 +122,7 @@ def my_text_classification_dag():
     write_test = write_test_task(df_tested)
 
     # Установка порядка выполнения задач
-    create_db >> get_ds >> unzip >> df1_df2
+    create_db >> get_ds >> unzip >> transform
     df1_df2['dftn'] >> df_prep >> df_rbl >> df_merged >> df_trained >> train_scoring >> write_train
     df1_df2['dfts'] >> df_tested >> test_scoring >> write_test
     

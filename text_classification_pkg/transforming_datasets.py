@@ -36,7 +36,6 @@ def transforming_datasets(test_path: str = "test.dat", train_path: str = "train.
     # Запись данных столбцов в файл .csv с заголовками
     df_ma_train.to_csv(train_csv_path, index=False, header=['abstracts'])
 
-    return df_ma_train, df_ma_test
 
 
 if __name__ == "__main__":

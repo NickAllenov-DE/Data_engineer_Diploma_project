@@ -147,10 +147,8 @@ def transforming_datasets(test_path: str = "test.dat", train_path: str = "train.
     # Запись данных столбцов в файл .csv с заголовком
     df_ma_train.to_csv(train_csv_path, index=False, header=['abstracts'])
 
-    return df_ma_train, df_ma_test
 
-
-def prepare_dfs_to_labeling(df_train: pd.DataFrame, manual_label_csv: str = 'manual_label_sample.csv', 
+def prepare_dfs_to_labeling(path_to_ds_csv: str, manual_label_csv: str = 'manual_label_sample.csv', 
                         rule_based_csv: str = 'rule_based_sample.csv', train_size: float = 0.01):
     """
     Divides the dataframe into two parts for manual markup and for automatic rule-based markup.
@@ -162,6 +160,8 @@ def prepare_dfs_to_labeling(df_train: pd.DataFrame, manual_label_csv: str = 'man
     rule_based_csv (str): Путь к файлу CSV для разметки на основе правил.
     train_size (float): Доля датафрейма для ручной разметки.
     """
+    
+    df_train = pd.read_csv(path_to_ds_csv)
 
     # Разделение датафрейма на две части - для ручной разметки и для разметки на основе правил
     manual_label_sample, rule_based_sample = train_test_split(df_train, train_size=train_size, random_state=42)
@@ -333,29 +333,33 @@ def teaching_and_saving_model(train_df: pd.DataFrame):
     return train_df
 
 
-def testing_model(test_df: pd.DataFrame) -> pd.DataFrame:
+def testing_model(path_to_ds_csv: str) -> pd.DataFrame:
     '''The function loads a trained machine learning model and applies it to an untagged dataframe'''
+
     # Загрузка модели
     model = load('model_ma_trained.joblib')
     # Загрузка векторизатора
     vectorizer = load('vectorizer_ma_trained.joblib')
 
+    df_test = pd.read_csv(path_to_ds_csv)
+
     # Преобразование текстовых данных нового датафрейма в векторный формат
-    X_new = vectorizer.transform(test_df['abstracts'])
+    X_new = vectorizer.transform(df_test['abstracts'])
     # Используем модель для предсказания меток новых данных
     Y_new_predicted = model.predict(X_new)
 
     # разметка тестового датасета на основе правил для послдующей
     # оценки эффективности модели
-    test_df = rule_based_labeling(test_df)
+    df_test = rule_based_labeling(df_test)
 
     # Добавление колонки с предсказанными значениями в датафрейм
-    test_df['predicted_mark'] = Y_new_predicted
+    df_test['predicted_mark'] = Y_new_predicted
    
     # Сохранение датасета с размеченными и предсказанными значениями
-    test_df.to_csv('ma_test_with_predictions.csv', index=False)
+    df_test.to_csv('ma_test_with_predictions.csv', index=False)
 
-    return test_df
+    return df_test
+
 
 
 def accuracy_scoring(df_for_evaluation: pd.DataFrame):
