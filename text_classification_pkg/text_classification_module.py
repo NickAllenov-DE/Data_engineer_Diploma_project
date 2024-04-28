@@ -14,8 +14,8 @@ import zipfile
 import os
 import pandas as pd
 from sqlalchemy import create_engine
-import MySQLdb
-# from airflow.hooks.base_hook import BaseHook
+from airflow.models import Variable
+from airflow.hooks.base_hook import BaseHook
 
 
 def getting_dataset_by_api(ds_name: str = 'chaitanyakck/medical-text', path: str = os.getcwd()):
@@ -374,8 +374,7 @@ def testing_model(path_to_ds_csv: str, tested_df_csv: str = 'ma_test_with_predic
 
     # разметка тестового датасета на основе правил для послдующей
     # оценки эффективности модели
-    
-    df_test['labeled_condition_mark'] = df_test['abstracts'].apply(rule_for_labeling)
+    df_test = rule_based_labeling(df_test)
 
     # Добавление колонки с предсказанными значениями в датафрейм
     df_test['predicted_mark'] = Y_new_predicted
@@ -408,15 +407,15 @@ def accuracy_scoring(df_for_evaluation_path: str):
     formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
     # Сохранение точности с датой и временем
-    with open('accuracy.txt', 'a', encoding='utf-8') as f:
+    with open('accuracy.txt', 'a') as f:
         f.write(f"Accuracy: {accuracy} (Дата и время: {formatted_time})\n")
 
     # Сохранение отчета о классификации с датой и временем
-    with open('classification_report.txt', 'a', encoding='utf-8') as f:
+    with open('classification_report.txt', 'a') as f:
         f.write(f"Отчет о классификации (Дата и время: {formatted_time}):\n{report}\n")
 
     # Сохранение матрицы ошибок с датой и временем
-    with open('confusion_matrix.txt', 'a', encoding='utf-8') as f:
+    with open('confusion_matrix.txt', 'a') as f:
         f.write(f"\nМатрица ошибок (Дата и время: {formatted_time}):\n")
         for line in conf_matrix:
             f.write(' '.join(str(x) for x in line) + '\n')

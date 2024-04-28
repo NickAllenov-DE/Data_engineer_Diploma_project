@@ -5,6 +5,8 @@ import pandas as pd
 
 def write_dataframe_to_mysql(table_name: str, df_path: str, mysql_conn_id: str):
     # Получение параметров подключения из Airflow
+    import MySQLdb
+    from airflow.hooks.base_hook import BaseHook
     connection_params = BaseHook.get_connection(mysql_conn_id)
     conn_str = f"mysql+mysqldb://{connection_params.login}:{connection_params.password}" \
                f"@{connection_params.host}/{connection_params.schema}"

@@ -33,7 +33,7 @@ from text_classification_pkg.text_classification_module import getting_dataset_b
         'depends_on_past': False,
         'start_date': pendulum.datetime(2024, 4, 25, tz='UTC'),
         'retries': 1,
-        'retry_delay': timedelta(minutes=2),
+        'retry_delay': timedelta(minutes=4),
     },
     description='A DAG to process and classification datasets contain\
         medical abstracts and store data in MySQL',
@@ -99,7 +99,7 @@ def my_text_classification_dag():
         write_dataframe_to_mysql('train_df_with_predictions', df_trained, 'mysql_conn_id')
 
     @task
-    def write_test_task(df_tested: str):
+    def write_test_task(df_tested: pd.DataFrame):
         write_dataframe_to_mysql('test_df_with_predictions', df_tested, 'mysql_conn_id')
 
     
