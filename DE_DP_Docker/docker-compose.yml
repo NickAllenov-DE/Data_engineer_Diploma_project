@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: AllenovNS
+      POSTGRES_PASSWORD: my_password
+      POSTGRES_DB: de_diploma_project
+    ports:
+         - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: AllenovNS@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: my_password
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+  superset:
+    image: apache/superset:latest
+    restart: always
+    environment:
+      SUPERSET_DB_URI: postgresql+psycopg2://AllenovNS:my_password@postgres/de_diploma_project
+      SUPERSET_SECRET_KEY: "my_superset_secret_key"
+    ports:
+      - "8088:8088"
+    volumes:
+      - superset_data:/var/lib/superset
+    depends_on:
+      - postgres
+    command: |
+      bash -c "superset db upgrade &&
+      (superset fab create-admin --username AllenovNS --password my_password --firstname Nick --lastname Allenov --email AllenovNS@gmail.com || true) &&
+      superset init &&
+      gunicorn -w 4 -k sync --timeout 120 -b 0.0.0.0:8088 'superset.app:create_app()'"
+      
+  airflow-webserver:
+    image: apache/airflow:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://AllenovNS:my_password@postgres/de_diploma_project
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__CORE__FERNET_KEY: "my_fernet_secret_key"
+      AIRFLOW__WEBSERVER__RBAC: 'true'
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./plugins:/opt/airflow/plugins
+      - ./data:/opt/airflow/data
+      - airflow_logs:/opt/airflow/logs
+    depends_on:
+      - postgres
+    command: |
+      bash -c "airflow db upgrade &&
+      (airflow users create --role Admin --username AllenovNS --email AllenovNS@gmail.com --firstname Nick --lastname Allenov --password my_password || true) &&
+      airflow webserver"
+
+  airflow-scheduler:
+    image: apache/airflow:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://AllenovNS:my_password@postgres/de_diploma_project
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__CORE__FERNET_KEY: "my_fernet_secret_key"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    depends_on:
+      - postgres
+    command: scheduler
+      
+volumes:
+  postgres_data:
+  pgadmin_data:
+  airflow_logs:
+  superset_data:

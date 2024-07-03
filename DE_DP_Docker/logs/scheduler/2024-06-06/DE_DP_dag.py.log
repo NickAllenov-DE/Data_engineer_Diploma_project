@@ -1,0 +1,7 @@
+[2024-06-06T06:16:40.757+0000] {processor.py:161} INFO - Started process (PID=7030) to work on /opt/airflow/dags/DE_DP_dag.py
+[2024-06-06T06:16:41.081+0000] {processor.py:830} INFO - Processing file /opt/airflow/dags/DE_DP_dag.py for tasks to queue
+[2024-06-06T06:16:41.253+0000] {logging_mixin.py:188} INFO - [2024-06-06T06:16:41.253+0000] {dagbag.py:545} INFO - Filling up the DagBag from /opt/airflow/dags/DE_DP_dag.py
+[2024-06-06T06:16:44.417+0000] {processor.py:840} INFO - DAG(s) 'Medical_text_classification' retrieved from /opt/airflow/dags/DE_DP_dag.py
+[2024-06-06T06:16:44.467+0000] {logging_mixin.py:188} INFO - [2024-06-06T06:16:44.466+0000] {dag.py:3096} INFO - Sync 1 DAGs
+[2024-06-06T06:16:44.483+0000] {logging_mixin.py:188} INFO - [2024-06-06T06:16:44.483+0000] {dag.py:3954} INFO - Setting next_dagrun for Medical_text_classification to None, run_after=None
+[2024-06-06T06:16:44.511+0000] {processor.py:183} INFO - Processing /opt/airflow/dags/DE_DP_dag.py took 3.789 seconds
