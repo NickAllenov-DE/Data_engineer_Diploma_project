@@ -19,12 +19,12 @@
 
 ## Структура проекта
 
-Data_engineer_Diploma_project/
-├── DE_DP_Docker/
-├── accuracy.txt
-├── classification_report.txt
-├── confusion_matrix.txt
-├── Дипломная работа Data Engineer.docx
+Data_engineer_Diploma_project/  
+├── DE_DP_Docker/  
+├── accuracy.txt  
+├── classification_report.txt  
+├── confusion_matrix.txt  
+├── Дипломная работа Data Engineer.docx  
 └── скриншоты/
 
 Использование
